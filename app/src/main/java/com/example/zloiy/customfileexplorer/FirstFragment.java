@@ -23,16 +23,16 @@ public class FirstFragment extends AppCompatActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ImageButton leftArrow = (ImageButton)findViewById(R.id.right_arrow);
         setContentView(R.layout.first_fragment);
+        ImageButton leftArrow = (ImageButton)findViewById(R.id.left_arrow);
         listView = (ListView) findViewById(R.id.listView);
         currentDir = new File("/");
         fill(currentDir);
         leftArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                startActivity();
+                Intent intent = new Intent(FirstFragment.this, SecondFragment.class);
+                startActivity(intent);
             }
         });
     }
@@ -92,7 +92,7 @@ public class FirstFragment extends AppCompatActivity {
     }
 
     private void onFileClick(Item item){
-        Intent intent = new Intent();
+        Intent intent = new Intent(FirstFragment.this, FirstFragment.class);
         intent.putExtra("GetPath", currentDir.toString());
         intent.putExtra("GetFileName", item.getName());
         setResult(RESULT_OK, intent);

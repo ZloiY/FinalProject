@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.io.File;
@@ -26,15 +27,30 @@ public class SecondFragment extends Activity {
         super.onCreate(onSavedInstances);
         setContentView(R.layout.second_fargment);
         listView = (ListView) findViewById(R.id.fast_access);
-        ArrayList<File> fastAccess = new ArrayList<>();
-        ArrayList<File> favorites = new ArrayList<>();
+        ImageButton rightArrow = (ImageButton)findViewById(R.id.right_arrow);
+        ImageButton homeBtn = (ImageButton)findViewById(R.id.home_btn);
+        final ArrayList<File> fastAccess = new ArrayList<>();
+        final ArrayList<File> favorites = new ArrayList<>();
         fastAccess.add(new File("/"));
         fastAccess.add(new File("/sdcard/"));
         fastAccess.add(new File("/sdcard/Download"));
         fillHome(fastAccess, favorites);
+        rightArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SecondFragment.this, FirstFragment.class);
+                startActivity(intent);
+            }
+        });
+        homeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fillHome(fastAccess,favorites);
+            }
+        });
     }
     private void fillHome (final ArrayList fastAccess, final ArrayList favorites){
-        this.setTitle("Select category: ");
+        SecondFragment.this.setTitle("Select category: ");
         File currentFile;
         List<Item>dir = new ArrayList<>();
         try{
@@ -51,11 +67,11 @@ public class SecondFragment extends Activity {
                     String num_items = String.valueOf(buf);
                 if (buf == 0) num_items = num_items + "item";
                 else num_items = num_items + " items";
-                if (currentFile.getName().equals("/"))
+                if (curFile == 0)
                     dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"root_folder"));
-                if (currentFile.getName().equals("/sdcard/"))
+                if (curFile==1)
                     dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"sd_card_icon"));
-                if (currentFile.getName().equals("/sdcard/Download"))
+                if (curFile==2)
                     dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"download_folder"));
             }
         }
@@ -69,11 +85,8 @@ public class SecondFragment extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Item item = adapter.getItem(position);
-                if (item.getImage().equalsIgnoreCase("folder_icon")){
-                    currentDir = new File(item.getPath());
+                     currentDir = new File(item.getPath());
                     fill(currentDir);
-                }else
-                    onFileClick(item);
             }
         });
     }
