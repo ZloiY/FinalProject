@@ -3,8 +3,11 @@ package com.example.zloiy.customfileexplorer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -27,8 +30,19 @@ public class SecondFragment extends Activity {
         super.onCreate(onSavedInstances);
         setContentView(R.layout.second_fargment);
         listView = (ListView) findViewById(R.id.fast_access);
+        CheckBox checkAll = (CheckBox) findViewById(R.id.chk_all);
+        checkAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckBox checkBox = (CheckBox) v;
+                int itemCount = listView.getCount();
+                for (int i =0; i<itemCount; i++)
+                    listView.setItemChecked(i, checkBox.isChecked());
+            }
+        });
         ImageButton rightArrow = (ImageButton)findViewById(R.id.right_arrow);
         ImageButton homeBtn = (ImageButton)findViewById(R.id.home_btn);
+        ImageButton copyBtn = (ImageButton)findViewById(R.id.cpy_btn);
         final ArrayList<File> fastAccess = new ArrayList<>();
         final ArrayList<File> favorites = new ArrayList<>();
         fastAccess.add(new File("/"));
@@ -46,6 +60,12 @@ public class SecondFragment extends Activity {
             @Override
             public void onClick(View v) {
                 fillHome(fastAccess,favorites);
+            }
+        });
+        copyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setCheckList();
             }
         });
     }
@@ -149,5 +169,30 @@ public class SecondFragment extends Activity {
         intent.putExtra("GetFileName", item.getName());
         setResult(RESULT_OK, intent);
         finish();
+    }
+    private void setCheckList(){
+        List<Item> allFiles = adapter.getItems();
+        ArrayAdapter<Item> checkAdapter = new ArrayAdapter<Item>(SecondFragment.this, android.R.layout.simple_list_item_multiple_choice, allFiles);
+        listView.setAdapter(checkAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CheckBox checkBox = (CheckBox) findViewById(R.id.chk_all);
+                int checkedItemCount = getCheckedItemCount();
+                if(listView.getCount() == checkedItemCount) checkBox.setChecked(true);
+                else checkBox.setChecked(false);
+            }
+        });
+    }
+    private int getCheckedItemCount(){
+        int cnt = 0;
+        SparseBooleanArray positions = listView.getCheckedItemPositions();
+        int itemCount = listView.getCount();
+
+        for (int i = 0; i < itemCount; i++) {
+            if (positions.get(i)) cnt++;
+        }
+
+        return cnt;
     }
 }

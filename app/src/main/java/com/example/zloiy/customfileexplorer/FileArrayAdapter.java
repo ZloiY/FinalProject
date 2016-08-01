@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +30,14 @@ public class FileArrayAdapter extends ArrayAdapter<Item> {
 
     public Item getItem(int i){
         return items.get(i);
+    }
+
+    public ArrayList<Item> getItems(){
+        ArrayList<Item> list = new ArrayList<>();
+        for (int i=0; i < items.size(); i++){
+            list.add(getItem(i));
+        }
+        return list;
     }
 
     public View getView(int postion, View convertView, ViewGroup parent){
