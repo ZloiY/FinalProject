@@ -23,6 +23,11 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/left_arrow" />
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/home_btn"
+            android:src="@drawable/home_folder_icon"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/line_right"

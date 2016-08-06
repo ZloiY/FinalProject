@@ -9,24 +9,6 @@
     android:paddingTop="16dp"
     tools:context=".SecondFragment"
     android:weightSum="1">
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_gravity="center_horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select all:"
-            android:id="@+id/check_text"/>
-
-        <CheckBox
-            android:id="@+id/chk_all"
-            android:layout_gravity="end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-    </RelativeLayout>
     <LinearLayout
         android:id="@+id/line_left"
         android:orientation="vertical"
@@ -58,9 +40,5 @@
             android:layout_height="50dp"
             android:src="@drawable/home_folder_icon"/>
 
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/cpy_btn" />
     </LinearLayout>
 </LinearLayout>
