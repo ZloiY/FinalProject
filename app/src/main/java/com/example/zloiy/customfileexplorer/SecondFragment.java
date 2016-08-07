@@ -1,32 +1,21 @@
 package com.example.zloiy.customfileexplorer;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.SparseBooleanArray;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.io.File;
-import java.lang.reflect.Array;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by ZloiY on 28-Jul-16.
  */
 public class SecondFragment extends AppCompatActivity {
     private ListView listView;
-    private FileArrayAdapter adapter;
     private File currentDir;
     protected void onCreate(Bundle onSavedInstances){
         super.onCreate(onSavedInstances);

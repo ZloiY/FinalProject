@@ -72,7 +72,6 @@ public class FileSearch {
             }
         });
     }
-
     private void fill (final File file){
         File[] dirs = file.listFiles();
         curActivity.setTitle("Current Dir: "+file.getName());
@@ -126,7 +125,60 @@ public class FileSearch {
             }
         });
     }
-
+    public void fillByName (String name){
+        File[] dirs = curDir.listFiles();
+        curActivity.setTitle("Current Dir: "+curDir.getName());
+        List<Item>dir = new ArrayList<>();
+        List<Item>fls = new ArrayList<>();
+        try{
+            for (File ff: dirs){
+                Date lastModifyDate = new Date(ff.lastModified());
+                DateFormat format = DateFormat.getDateInstance();
+                String date_modify = format.format(lastModifyDate);
+                if (ff.isDirectory() && ff.getName().contains(name)){
+                    File[] fbuf = ff.listFiles();
+                    int buf = 0;
+                    if (fbuf != null){
+                        buf = fbuf.length;
+                    }else buf =0;
+                    String num_items = String.valueOf(buf);
+                    if (buf == 0) num_items = num_items + "item";
+                    else num_items = num_items + " items";
+                    dir.add(new Item(ff.getName(), num_items, date_modify, ff.getAbsolutePath(),"folder_icon"));}
+                else{
+                    if (ff.getName().contains(name))
+                    fls.add(new Item(ff.getName(), ff.length() + "Bytes", date_modify, ff.getAbsolutePath(), "file_icon"));
+                }
+            }
+        }catch (Exception e){
+            e.getStackTrace();
+        }
+        Collections.sort(dir);
+        Collections.sort(fls);
+        dir.addAll(fls);
+        if (!curDir.getName().equalsIgnoreCase("/"))
+            dir.add(0, new Item("..", "ParentDirectory", "", curDir.getParent(), "upfolder_icon"));
+        adapter = new FileArrayAdapter(curActivity, R.layout.list_layout, dir);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Item item = adapter.getItem(position);
+                if (item.getImage().equalsIgnoreCase("folder_icon")){
+                    curDir = new File(item.getPath());
+                    fill(curDir);
+                }else
+                if (item.getImage().equalsIgnoreCase("upfolder_icon")){
+                    if (curDir.getParent() == null);
+                    else {
+                        curDir = new File(item.getPath());
+                        fill(curDir);
+                    }
+                }else
+                    onFileClick(item);
+            }
+        });
+    }
     private void onFileClick(Item item){
         Intent intent = new Intent();
         intent.putExtra("GetPath", curDir.toString());
@@ -134,4 +186,5 @@ public class FileSearch {
         curActivity.setResult(curActivity.RESULT_OK, intent);
         curActivity.recreate();
     }
+    public String getCurDir(){return curDir.getPath();}
 }
