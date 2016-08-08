@@ -11,6 +11,7 @@ public class Item implements Comparable<Item> {
     private String date;
     private String path;
     private String image;
+    private boolean check;
 
     public Item(String name, String data, String date, String path, String image){
         this.name = name;
@@ -18,6 +19,15 @@ public class Item implements Comparable<Item> {
         this.date = date;
         this.path = path;
         this.image = image;
+    }
+
+    public Item(String name, String data, String date, String path, String image, boolean check){
+        this.name = name;
+        this.data = data;
+        this.date = date;
+        this.path = path;
+        this.image = image;
+        this.check = check;
     }
 
     public String getName() {
@@ -38,6 +48,18 @@ public class Item implements Comparable<Item> {
 
     public String getImage() {
         return image;
+    }
+
+    public boolean isCheck(){
+        if(check)
+            return true;
+        else return false;
+    }
+
+    public void setCheck(){
+        if(check)
+            check = false;
+        else check = true;
     }
 
     public int compareTo(Item o) {

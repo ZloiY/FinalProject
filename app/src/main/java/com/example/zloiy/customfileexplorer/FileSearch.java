@@ -125,6 +125,42 @@ public class FileSearch {
             }
         });
     }
+    public void fillWithCheck (final File file){
+        File[] dirs = file.listFiles();
+        MultiplyChekAdapter adapter;
+        curActivity.setTitle("Current Dir: "+file.getName());
+        List<Item>dir = new ArrayList<>();
+        List<Item>fls = new ArrayList<>();
+        try{
+            for (File ff: dirs){
+                Date lastModifyDate = new Date(ff.lastModified());
+                DateFormat format = DateFormat.getDateInstance();
+                String date_modify = format.format(lastModifyDate);
+                if (ff.isDirectory()){
+                    File[] fbuf = ff.listFiles();
+                    int buf = 0;
+                    if (fbuf != null){
+                        buf = fbuf.length;
+                    }else buf =0;
+                    String num_items = String.valueOf(buf);
+                    if (buf == 0) num_items = num_items + "item";
+                    else num_items = num_items + " items";
+                    dir.add(new Item(ff.getName(), num_items, date_modify, ff.getAbsolutePath(),"folder_icon", false));}
+                else{
+                    fls.add(new Item(ff.getName(), ff.length() + "Bytes", date_modify, ff.getAbsolutePath(), "file_icon", false));
+                }
+            }
+        }catch (Exception e){
+            e.getStackTrace();
+        }
+        Collections.sort(dir);
+        Collections.sort(fls);
+        dir.addAll(fls);
+       /* if (!file.getName().equalsIgnoreCase("/"))
+            dir.add(0, new Item("..", "ParentDirectory", "", file.getParent(), "upfolder_icon"));*/
+        adapter = new MultiplyChekAdapter(curActivity, R.layout.check_list, dir);
+        listView.setAdapter(adapter);
+    }
     public void fillByName (String name){
         File[] dirs = curDir.listFiles();
         curActivity.setTitle("Current Dir: "+curDir.getName());

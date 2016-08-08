@@ -51,7 +51,7 @@ public class FileArrayAdapter extends ArrayAdapter<Item> {
             TextView nameTV = (TextView) v.findViewById(R.id.name);
             TextView itemSizeTV = (TextView) v.findViewById(R.id.item_size);
             TextView dateTV = (TextView) v.findViewById(R.id.date);
-            ImageView iconIV = (ImageView) v.findViewById(R.id.icon);
+            ImageView iconIV = (ImageView) v.findViewById(R.id.icon1);
             String url = "drawable/" + o.getImage();
             int imageRes = context.getResources().getIdentifier(url, null, context.getPackageName());
             Drawable image = context.getResources().getDrawable(imageRes);

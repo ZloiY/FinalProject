@@ -49,7 +49,7 @@ public class FirstFragment extends AppCompatActivity {
         homeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fileSearch.fillHome(fastAccess,favorites);
+                fileSearch.fillWithCheck(new File("/"));
             }
         });
     }

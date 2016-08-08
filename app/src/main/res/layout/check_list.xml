@@ -9,7 +9,7 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/icon"
+        android:id="@+id/icon1"
         android:layout_width="50dip"
         android:layout_height="50dip" />
     <TextView
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:textStyle="bold"
-        android:layout_toRightOf="@+id/icon"
+        android:layout_toRightOf="@+id/icon1"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="5dp"
         />
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/item_size"
         android:text="@+id/item_size"
-        android:layout_toRightOf="@+id/icon"
+        android:layout_toRightOf="@+id/icon1"
         android:layout_below="@+id/name"
         android:layout_marginLeft="10dp"
         />
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/chk_box"
-        android:layout_alignBottom="@+id/icon"
+        android:layout_alignBottom="@+id/icon1"
         android:layout_toLeftOf="@+id/date"
         android:layout_toStartOf="@+id/date" />
 </RelativeLayout>
