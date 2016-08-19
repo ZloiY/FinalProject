@@ -56,7 +56,6 @@ public class FileArrayAdapter extends ArrayAdapter<Item> {
             int imageRes = context.getResources().getIdentifier(url, null, context.getPackageName());
             Drawable image = context.getResources().getDrawable(imageRes);
             iconIV.setImageDrawable(image);
-
             if (nameTV != null)
                 nameTV.setText(o.getName());
             if (itemSizeTV != null)

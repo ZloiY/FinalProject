@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="16dp"
@@ -13,9 +13,9 @@
 
     <LinearLayout
         android:id="@+id/line_left"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_marginRight="5dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1">
 
@@ -29,14 +29,20 @@
             android:layout_height="50dp"
             android:id="@+id/home_btn"
             android:src="@drawable/home_folder_icon"/>
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/switch_mode"
+            android:textOn="Check"
+            android:textOff="Normal"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/line_right"
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
         <ListView
-            android:layout_width="283dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/listView" />
     </LinearLayout>

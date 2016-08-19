@@ -72,7 +72,7 @@ public class FileSearch {
             }
         });
     }
-    private void fill (final File file){
+    public void fill (final File file){
         File[] dirs = file.listFiles();
         curActivity.setTitle("Current Dir: "+file.getName());
         List<Item>dir = new ArrayList<>();
