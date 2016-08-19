@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="Change name"
+        android:id="@+id/change_name"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:title="Copy"
+        android:id="@+id/copy"
+        app:showAsAction = "ifRoom"/>
+    <item
+        android:id="@+id/cut"
+        android:title="Cut"
+        app:showAsAction = "ifRoom"/>
+    <item
+        android:title="Delete"
+        android:id="@+id/delete"
+        app:showAsAction = "ifRoom"/>
+</menu>

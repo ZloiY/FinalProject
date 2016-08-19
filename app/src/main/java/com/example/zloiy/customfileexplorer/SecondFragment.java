@@ -34,6 +34,7 @@ public class SecondFragment extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SecondFragment.this, FirstFragment.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         });

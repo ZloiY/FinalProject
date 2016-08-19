@@ -10,11 +10,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -38,6 +40,7 @@ public class FirstFragment extends AppCompatActivity {
         ImageButton homeBtn = (ImageButton)findViewById(R.id.home_btn);
         ToggleButton switchMode = (ToggleButton)findViewById(R.id.switch_mode);
         listView = (ListView) findViewById(R.id.listView);
+        registerForContextMenu(listView);
         fileSearch = new FileSearch(FirstFragment.this, listView);
         currentDir = new File("/");
         final ArrayList<File> fastAccess = new ArrayList<>();
@@ -62,6 +65,7 @@ public class FirstFragment extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(FirstFragment.this, SecondFragment.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         });
@@ -73,13 +77,11 @@ public class FirstFragment extends AppCompatActivity {
         });
     }
 
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         setOptionsMenu(item);
         return true;
@@ -136,6 +138,17 @@ public class FirstFragment extends AppCompatActivity {
                 break;
         }
     }
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo info){
+        super.onCreateContextMenu(menu,view,info);
+        getMenuInflater().inflate(R.menu.context_menu, menu);
+    }
+    public boolean onContextItemSelected(MenuItem item){
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()){
+
+        }
+        return true;
+    }
 
     private ActionMode.Callback actionBar = new ActionMode.Callback() {
         @Override
@@ -159,4 +172,5 @@ public class FirstFragment extends AppCompatActivity {
             actionMode = null;
         }
     };
+
 }

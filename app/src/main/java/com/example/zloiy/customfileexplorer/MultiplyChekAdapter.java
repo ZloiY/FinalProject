@@ -6,15 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,7 +60,7 @@ public class MultiplyChekAdapter extends ArrayAdapter<Item> {
             Drawable image = context.getResources().getDrawable(imageRes);
             imageView.setImageDrawable(image);
             if (nameTV != null) nameTV.setText(item.getName());
-            if (sizeTV != null) sizeTV.setText(item.getPath());
+            if (sizeTV != null) sizeTV.setText(item.getData());
             if (dateTV != null) dateTV.setText(item.getDate());
             checkBox.setChecked(item.isCheck());
         }

@@ -12,4 +12,9 @@
         android:icon="@drawable/cut_icon"
         android:title="Cut"
         app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/delete"
+        android:icon="@drawable/remove_icon"
+        android:title="Delete"
+        app:showAsAction = "ifRoom|withText"/>
 </menu>
