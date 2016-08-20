@@ -10,9 +10,14 @@
     <item
         android:id="@+id/new_folder"
         android:icon="@drawable/new_folder"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:title="New Folder"
         />
+    <item
+        android:id="@+id/new_file"
+        android:title="New file"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/new_file_icon"/>
     <item
         android:id="@+id/search"
         android:title="Search"

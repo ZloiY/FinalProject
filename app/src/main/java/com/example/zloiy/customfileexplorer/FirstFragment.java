@@ -27,15 +27,16 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class FirstFragment extends AppCompatActivity {
-
     private File currentDir;
     private ListView listView;
     private FileSearch fileSearch;
     private ActionMode actionMode;
+    private FileOperations operations;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.first_fragment);
+        operations = new FileOperations();
         ImageButton leftArrow = (ImageButton)findViewById(R.id.left_arrow);
         ImageButton homeBtn = (ImageButton)findViewById(R.id.home_btn);
         ToggleButton switchMode = (ToggleButton)findViewById(R.id.switch_mode);
@@ -136,6 +137,34 @@ public class FirstFragment extends AppCompatActivity {
                         .setCancelable(true);
                 builder1.create().show();
                 break;
+            case R.id.paste:
+                if(!operations.getInputPath().isEmpty()){
+                    operations.copyFile(fileSearch.getCurDir());
+                    fileSearch.fill(new File(fileSearch.getCurDir()));
+                }break;
+            case R.id.new_file:
+                layout = getLayoutInflater().inflate(R.layout.new_folder, null);
+                final EditText fileName= (EditText)layout.findViewById(R.id.folder_name);
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this)
+                        .setTitle("New file")
+                        .setCancelable(true)
+                        .setView(layout)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                operations.newFile(fileName.getText().toString(),fileSearch.getCurDir());
+                                fileSearch.fill(new File(fileSearch.getCurDir()));
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder2.create().show();
+                break;
         }
     }
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo info){
@@ -144,8 +173,21 @@ public class FirstFragment extends AppCompatActivity {
     }
     public boolean onContextItemSelected(MenuItem item){
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int index = menuInfo.position;
+        Item item1 =(Item)listView.getAdapter().getItem(index);
         switch (item.getItemId()){
-
+            case R.id.copy:
+                operations.setInputPath(fileSearch.getCurDir(), item1.getName(),false);
+                break;
+            case R.id.cut:
+                operations.setInputPath(fileSearch.getCurDir(), item1.getName(),true);
+                break;
+            case R.id.delete:
+                operations.deleteFile(item1.getName(),fileSearch.getCurDir());
+                fileSearch.fill(new File(fileSearch.getCurDir()));
+                break;
+            case R.id.change_name:
+                break;
         }
         return true;
     }
