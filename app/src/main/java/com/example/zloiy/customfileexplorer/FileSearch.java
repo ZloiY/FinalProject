@@ -52,9 +52,17 @@ public class FileSearch {
                 if (curFile == 0)
                     dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"root_folder"));
                 if (curFile==1)
-                    dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"sd_card_icon"));
+                    dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"sdcard_icon1"));
                 if (curFile==2)
-                    dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"download_folder"));
+                    dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"download_folder_icon"));
+                if (curFile==3)
+                    dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(),"music_folder"));
+                if (curFile==4)
+                    dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(), "camera_folder_icon"));
+                if (curFile==5)
+                    dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(), "picture_icon_folder"));
+//                if (curFile==6)
+//                    dir.add(new Item(currentFile.getName(), num_items, date_modify, currentFile.getAbsolutePath(), "document_folder_icon"));
             }
         }
         catch (Exception e){

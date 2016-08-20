@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,7 +21,9 @@ import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.io.File;
@@ -37,8 +40,8 @@ public class FirstFragment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.first_fragment);
         operations = new FileOperations();
-        ImageButton leftArrow = (ImageButton)findViewById(R.id.left_arrow);
-        ImageButton homeBtn = (ImageButton)findViewById(R.id.home_btn);
+        ImageView leftArrow = (ImageView) findViewById(R.id.left_arrow);
+        ImageView homeImage = (ImageView) findViewById(R.id.home_btn);
         ToggleButton switchMode = (ToggleButton)findViewById(R.id.switch_mode);
         listView = (ListView) findViewById(R.id.listView);
         registerForContextMenu(listView);
@@ -48,7 +51,11 @@ public class FirstFragment extends AppCompatActivity {
         final ArrayList<File> favorites = new ArrayList<>();
         fastAccess.add(new File(Environment.getRootDirectory().getPath()));
         fastAccess.add(new File(Environment.getExternalStorageDirectory().getPath()));
-        fastAccess.add(new File(Environment.getDownloadCacheDirectory().getPath()));
+        fastAccess.add(new File(Environment.DIRECTORY_DOWNLOADS));
+        fastAccess.add(new File(Environment.DIRECTORY_MUSIC));
+        fastAccess.add(new File(Environment.DIRECTORY_DCIM));
+        fastAccess.add(new File(Environment.DIRECTORY_PICTURES));
+        //fastAccess.add(new File(Environment.DIRECTORY_DOCUMENTS));
         fileSearch.fillHome(fastAccess, favorites);
         switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -70,7 +77,7 @@ public class FirstFragment extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        homeBtn.setOnClickListener(new View.OnClickListener() {
+        homeImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fileSearch.fillHome(fastAccess, favorites);
@@ -152,7 +159,7 @@ public class FirstFragment extends AppCompatActivity {
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                operations.newFile(fileName.getText().toString(),fileSearch.getCurDir());
+                                operations.newFile(fileName.getText().toString(),fileSearch.getCurDir(), getBaseContext());
                                 fileSearch.fill(new File(fileSearch.getCurDir()));
                                 dialog.dismiss();
                             }
@@ -174,24 +181,48 @@ public class FirstFragment extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item){
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int index = menuInfo.position;
-        Item item1 =(Item)listView.getAdapter().getItem(index);
+        final Item item1 =(Item)listView.getAdapter().getItem(index);
         switch (item.getItemId()){
             case R.id.copy:
                 operations.setInputPath(fileSearch.getCurDir(), item1.getName(),false);
+                Toast.makeText(this,"File copy",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.cut:
                 operations.setInputPath(fileSearch.getCurDir(), item1.getName(),true);
+                Toast.makeText(this,"File cut", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.delete:
                 operations.deleteFile(item1.getName(),fileSearch.getCurDir());
                 fileSearch.fill(new File(fileSearch.getCurDir()));
                 break;
             case R.id.change_name:
+                View layout = getLayoutInflater().inflate(R.layout.new_folder,null);
+                final EditText changeName = (EditText)layout.findViewById(R.id.folder_name);
+                changeName.setText(item1.getName());
+                AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                        .setView(layout)
+                        .setTitle("Change name")
+                        .setCancelable(true)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                File file = new File(item1.getPath());
+                                boolean rn = file.renameTo(new File(fileSearch.getCurDir() +"/"+ changeName.getText().toString()));
+                                fileSearch.fill(new File(fileSearch.getCurDir()));
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.create().show();
                 break;
         }
         return true;
     }
-
     private ActionMode.Callback actionBar = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -214,5 +245,4 @@ public class FirstFragment extends AppCompatActivity {
             actionMode = null;
         }
     };
-
 }

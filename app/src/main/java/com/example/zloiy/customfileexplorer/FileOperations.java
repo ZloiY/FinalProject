@@ -1,11 +1,13 @@
 package com.example.zloiy.customfileexplorer;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -40,8 +42,8 @@ public class FileOperations {
         OutputStream out = null;
         try {
             File dir = new File(outputPath);
-            in = new FileInputStream(inputPath + file);
-            out = new FileOutputStream(outputPath + file);
+            in = new FileInputStream(inputPath +"/"+file);
+            out = new FileOutputStream(outputPath +"/"+file);
             byte[] buffer = new byte[1024];
             int read;
             while ((read = in.read(buffer)) != -1) {
@@ -52,7 +54,7 @@ public class FileOperations {
             out.flush();
             out.close();
             out = null;
-            if(cut) new File(inputPath + file).delete();
+            if(cut) new File(inputPath +"/"+file).delete();
 
         }catch (FileNotFoundException fnfe1) {
             Log.e("tag", fnfe1.getMessage());
@@ -63,17 +65,18 @@ public class FileOperations {
     }
     public  void deleteFile(String file, String inputPath){
         try{
-            new File(inputPath + file).delete();
+            File deleteFile = new File(inputPath +"/"+ file);
+            boolean deleted = deleteFile.delete();
         }catch (Exception e){
             Log.e("tag", e.getMessage());
         }
     }
-    public void newFile(String fileName, String inputPath){
+    public void newFile(String fileName, String inputPath, Context context){
         try{
-            FileOutputStream fileOutputStream = new FileOutputStream(inputPath+fileName);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-            outputStreamWriter.flush();
-            outputStreamWriter.close();
+            File file = new File(inputPath + "/" + fileName);
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.flush();
+            fileWriter.close();
         }catch (Exception e){
             Log.e("tag", e.getMessage());
         }
