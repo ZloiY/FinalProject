@@ -134,6 +134,7 @@ public class FileSearch {
         });
     }
     public void fillWithCheck (final File file){
+        int curItem = 0;
         File[] dirs = file.listFiles();
         MultiplyChekAdapter adapter;
         curActivity.setTitle("Current Dir: "+file.getName());
@@ -153,10 +154,10 @@ public class FileSearch {
                     String num_items = String.valueOf(buf);
                     if (buf == 0) num_items = num_items + "item";
                     else num_items = num_items + " items";
-                    dir.add(new Item(ff.getName(), num_items, date_modify, ff.getAbsolutePath(),"folder_icon", false));}
+                    dir.add(new Item(ff.getName(), num_items, date_modify, ff.getAbsolutePath(),"folder_icon" ));}
                 else{
-                    fls.add(new Item(ff.getName(), ff.length() + "Bytes", date_modify, ff.getAbsolutePath(), "file_icon", false));
-                }
+                    fls.add(new Item(ff.getName(), ff.length() + "Bytes", date_modify, ff.getAbsolutePath(), "file_icon"));}
+                curItem++;
             }
         }catch (Exception e){
             e.getStackTrace();

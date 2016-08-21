@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ZloiY on 20-Aug-16.
@@ -20,41 +21,69 @@ public class FileOperations {
     private String inputPath;
     private String file;
     private ArrayList<String> inputPaths;
+    private Context context;
+    private boolean multi;
     boolean cut;
+    FileOperations(Context context){
+        inputPath="";
+        multi = false;
+        cut = false;
+        inputPaths = new ArrayList<>();
+        this.context = context;
+    }
     FileOperations(){
         inputPath="";
+        multi = false;
+        cut = false;
         inputPaths = new ArrayList<>();
     }
     public void setInputPath(String inputPath, String file, boolean cut){
+        multi =false;
         this.file = file;
         this.inputPath = inputPath;
         this.cut = cut;
     }
+    public void setInputPath(String inputPath){
+        this.inputPath = inputPath;
+    }
     public String getInputPath(){return inputPath;}
-    public void setInputPaths(String[] inputArray, boolean cut){
+    public ArrayList<String> getInputPaths(){return  inputPaths;}
+    public void setInputPaths(ArrayList<Item> inputArray, boolean cut){
         this.cut = cut;
-        for(int i=0; i < inputArray.length; i++){
-             inputPaths.add(inputArray[i]);
+        this.multi = true;
+        for (int index = 0; index<inputArray.size(); index++){
+            if (inputArray.get(index).isCheck())
+                inputPaths.add(inputArray.get(index).getPath());
         }
     }
     public void copyFile(String outputPath){
         InputStream in = null;
         OutputStream out = null;
         try {
-            File dir = new File(outputPath);
-            in = new FileInputStream(inputPath +"/"+file);
-            out = new FileOutputStream(outputPath +"/"+file);
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
+            if (!multi) {
+                File dir = new File(outputPath);
+                in = new FileInputStream(inputPath + "/" + file);
+                out = new FileOutputStream(outputPath + "/" + file);
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+                in.close();
+                in = null;
+                out.flush();
+                out.close();
+                out = null;
+                if (cut) new File(inputPath + "/" + file).delete();
+            }else{
+                CopyTask copyTask = new CopyTask(context, outputPath, inputPath, cut);
+                List<File> files = new ArrayList<>();
+                for (int curFile=0; curFile<inputPaths.size(); curFile++){
+                    files.add(new File(inputPaths.get(curFile)));
+                }
+                File[] filesArray = files.toArray(new File[files.size()]);
+                copyTask.execute(filesArray);
             }
-            in.close();
-            in = null;
-            out.flush();
-            out.close();
-            out = null;
-            if(cut) new File(inputPath +"/"+file).delete();
 
         }catch (FileNotFoundException fnfe1) {
             Log.e("tag", fnfe1.getMessage());
@@ -63,7 +92,7 @@ public class FileOperations {
             Log.e("tag", e.getMessage());
         }
     }
-    public  void deleteFile(String file, String inputPath){
+    public void deleteFile(String file, String inputPath){
         try{
             File deleteFile = new File(inputPath +"/"+ file);
             boolean deleted = deleteFile.delete();
@@ -74,9 +103,21 @@ public class FileOperations {
     public void newFile(String fileName, String inputPath, Context context){
         try{
             File file = new File(inputPath + "/" + fileName);
-            FileWriter fileWriter = new FileWriter(file);
-            fileWriter.flush();
-            fileWriter.close();
+            if (!file.exists()) {
+                FileWriter fileWriter = new FileWriter(file);
+                fileWriter.flush();
+                fileWriter.close();
+            }
+        }catch (Exception e){
+            Log.e("tag", e.getMessage());
+        }
+    }
+    public void multiDelFiles(){
+        try{
+            for (int i=0; i < inputPaths.size(); i++){
+                File delFile = new File(inputPaths.get(i));
+                boolean deleted = delFile.delete();
+            }
         }catch (Exception e){
             Log.e("tag", e.getMessage());
         }

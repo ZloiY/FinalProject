@@ -6,21 +6,17 @@ import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -39,7 +35,7 @@ public class FirstFragment extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.first_fragment);
-        operations = new FileOperations();
+        operations = new FileOperations(FirstFragment.this);
         ImageView leftArrow = (ImageView) findViewById(R.id.left_arrow);
         ImageView homeImage = (ImageView) findViewById(R.id.home_btn);
         ToggleButton switchMode = (ToggleButton)findViewById(R.id.switch_mode);
@@ -109,6 +105,7 @@ public class FirstFragment extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 File curFolder = new File(fileSearch.getCurDir() + "/" + folderName.getText().toString());
                                 if (!curFolder.exists()) curFolder.mkdir();
+                                fileSearch.fill(new File(fileSearch.getCurDir()));
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -145,10 +142,10 @@ public class FirstFragment extends AppCompatActivity {
                 builder1.create().show();
                 break;
             case R.id.paste:
-                if(!operations.getInputPath().isEmpty()){
-                    operations.copyFile(fileSearch.getCurDir());
-                    fileSearch.fill(new File(fileSearch.getCurDir()));
-                }break;
+                if(!operations.getInputPath().isEmpty()) operations.copyFile(fileSearch.getCurDir());
+                Toast.makeText(this, "Files paste", Toast.LENGTH_SHORT).show();
+                fileSearch.fill(new File(fileSearch.getCurDir()));
+                break;
             case R.id.new_file:
                 layout = getLayoutInflater().inflate(R.layout.new_folder, null);
                 final EditText fileName= (EditText)layout.findViewById(R.id.folder_name);
@@ -237,12 +234,32 @@ public class FirstFragment extends AppCompatActivity {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()){
+                case R.id.delete:
+                    MultiplyChekAdapter adapter = (MultiplyChekAdapter) listView.getAdapter();
+                    operations.setInputPaths(adapter.getArrayList(), false);
+                    operations.multiDelFiles();
+                    fileSearch.fillWithCheck(new File(fileSearch.getCurDir()));
+                    break;
+                case R.id.copy:
+                    MultiplyChekAdapter copyAdapter = (MultiplyChekAdapter) listView.getAdapter();
+                    operations.setInputPath(fileSearch.getCurDir());
+                    operations.setInputPaths(copyAdapter.getArrayList(), false);
+                    Toast.makeText(getBaseContext(),operations.getInputPaths().size() + " files copy", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.cut:
+                    MultiplyChekAdapter copyAdapter1 = (MultiplyChekAdapter) listView.getAdapter();
+                    operations.setInputPath(fileSearch.getCurDir());
+                    operations.setInputPaths(copyAdapter1.getArrayList(), true);
+                    Toast.makeText(getBaseContext(),operations.getInputPaths().size() + " files cut", Toast.LENGTH_SHORT).show();
+                    break;
+            }
             return false;
         }
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            actionMode = null;
+            //actionMode = null;
         }
     };
 }

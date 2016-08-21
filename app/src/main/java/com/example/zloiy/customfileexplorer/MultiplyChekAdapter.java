@@ -9,8 +9,10 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,6 +67,13 @@ public class MultiplyChekAdapter extends ArrayAdapter<Item> {
             checkBox.setChecked(item.isCheck());
         }
         return view;
+    }
+
+    public ArrayList<Item> getArrayList(){
+        ArrayList<Item> list = new ArrayList<>();
+        for (int i=0; i < itemCheckList.size(); i++)
+            list.add(itemCheckList.get(i));
+        return list;
     }
 
     @Override

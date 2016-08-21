@@ -32,7 +32,7 @@ public class FileArrayAdapter extends ArrayAdapter<Item> {
         return items.get(i);
     }
 
-    public ArrayList<Item> getItems(){
+    public ArrayList<Item> getArrayList(){
         ArrayList<Item> list = new ArrayList<>();
         for (int i=0; i < items.size(); i++){
             list.add(getItem(i));
