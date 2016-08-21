@@ -140,7 +140,7 @@ public class FirstFragment extends AppCompatActivity {
                 builder1.create().show();
                 break;
             case R.id.paste:
-                if(!operations.getInputPath().isEmpty()) operations.copyFile(fileSearch.getCurDir());
+                if(!operations.getInputPath().isEmpty()) operations.copyInAnotherTask(fileSearch.getCurDir());
                 Toast.makeText(this, "Files paste", Toast.LENGTH_SHORT).show();
                 fileSearch.fill(new File(fileSearch.getCurDir()));
                 break;
@@ -177,13 +177,17 @@ public class FirstFragment extends AppCompatActivity {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int index = menuInfo.position;
         final Item item1 =(Item)listView.getAdapter().getItem(index);
+        ArrayList<Item> arrayList = new ArrayList<>();
+        arrayList.add(item1);
+        operations.setInputPathsNoCheck(arrayList, false);
+        operations.setInputPath(fileSearch.getCurDir());
         switch (item.getItemId()){
             case R.id.copy:
-                operations.setInputPath(fileSearch.getCurDir(), item1.getName(),false);
+                operations.setCut(false);
                 Toast.makeText(this,"File copy",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.cut:
-                operations.setInputPath(fileSearch.getCurDir(), item1.getName(),true);
+                operations.setCut(true);
                 Toast.makeText(this,"File cut", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.delete:

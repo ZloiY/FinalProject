@@ -27,8 +27,8 @@ public class CopyTask extends AsyncTask<File, Long, Boolean> {
         progress = ProgressDialog.show(context,"","Loading...",true);
     }
     protected Boolean doInBackground(File... files) {
-        for (int cutFile=0; cutFile<files.length; cutFile++){
-            operations.setInputPath(inputPath, files[cutFile].getName(), cut);
+        for (File ff: files){
+            operations.setInputPath(inputPath, ff.getName(), cut);
             operations.copyFile(outputPath);
         }
         return true;
