@@ -26,7 +26,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class FirstFragment extends AppCompatActivity {
-    private File currentDir;
     private ListView listView;
     private FileSearch fileSearch;
     private ActionMode actionMode;
@@ -42,7 +41,6 @@ public class FirstFragment extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.listView);
         registerForContextMenu(listView);
         fileSearch = new FileSearch(FirstFragment.this, listView);
-        currentDir = new File("/");
         final ArrayList<File> fastAccess = new ArrayList<>();
         final ArrayList<File> favorites = new ArrayList<>();
         fastAccess.add(new File(Environment.getRootDirectory().getPath()));
