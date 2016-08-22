@@ -34,6 +34,7 @@ public class SecondFragment extends AppCompatActivity {
     private FileSearch fileSearch;
     private ActionMode actionMode;
     private FileOperations operations;
+    private String curDir1;
     protected void onCreate(Bundle onSavedInstances){
         super.onCreate(onSavedInstances);
         setContentView(R.layout.second_fargment);
@@ -52,8 +53,29 @@ public class SecondFragment extends AppCompatActivity {
         fastAccess.add(new File(Environment.DIRECTORY_MUSIC));
         fastAccess.add(new File(Environment.DIRECTORY_DCIM));
         fastAccess.add(new File(Environment.DIRECTORY_PICTURES));
-        fileSearch.fillHome(fastAccess, favorites);
-        fileSearch.fillHome(fastAccess, favorites);
+        Intent intent = getIntent();
+        if(intent.hasExtra("curDirectory2")) {
+            String dirPath = intent.getStringExtra("curDirectory2");
+            if (dirPath.isEmpty())
+                fileSearch.fill(new File(dirPath));
+        }else{
+            fileSearch.fillHome(fastAccess, favorites);
+        }
+        if (intent.hasExtra("curDirectory1")) {
+            curDir1 = intent.getStringExtra("curDirectory1");
+        }
+        if (intent.hasExtra("copyFilePath")&&intent.hasExtra("copyFileName")) {
+            String copyFilePath = intent.getStringExtra("copyFilePath");
+            String copyFileName = intent.getStringExtra("copyFileName");
+            boolean cut = intent.getBooleanExtra("cut", false);
+            if (copyFileName != null && copyFilePath != null) {
+                ArrayList<Item> list = new ArrayList<>();
+                list.add(new Item(copyFileName, "", "", copyFilePath + "/" + copyFileName, "", true));
+                operations.setInputPath(copyFilePath);
+                operations.setInputPaths(list, cut);
+                operations.setFile(copyFileName);
+            }
+        }
         switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -71,6 +93,13 @@ public class SecondFragment extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(SecondFragment.this, FirstFragment.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("curDirectory1", curDir1);
+                intent.putExtra("copyFilePath", operations.getInputPath());
+                intent.putExtra("copyFileName", operations.getCurFile());
+                intent.putExtra("cut", operations.cut);
+                if (fileSearch.getCurDir()!=null) {
+                    intent.putExtra("curDirectory2", fileSearch.getCurDir());
+                }
                 startActivity(intent);
             }
         });

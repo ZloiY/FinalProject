@@ -231,5 +231,9 @@ public class FileSearch {
         curActivity.setResult(curActivity.RESULT_OK, intent);
         curActivity.recreate();
     }
-    public String getCurDir(){return curDir.getPath();}
+    public String getCurDir(){
+        if (curDir!=null)
+        return curDir.getPath();
+        else return null;
+    }
 }

@@ -44,6 +44,7 @@ public class FileOperations {
     public void setInputPath(String inputPath){
         this.inputPath = inputPath;
     }
+    public String getCurFile(){return file;}
     public String getInputPath(){return inputPath;}
     public ArrayList<String> getInputPaths(){return  inputPaths;}
     public void setInputPaths(ArrayList<Item> inputArray, boolean cut){
@@ -55,7 +56,11 @@ public class FileOperations {
     }
     public void setInputPathsNoCheck(ArrayList<Item> inputArray, boolean cut){
         this.cut = cut;
+        file = inputArray.get(0).getName();
         inputPaths.add(inputArray.get(0).getPath());
+    }
+    public void setFile(String file){
+        this.file = file;
     }
     public void copyFile(String outputPath){
         InputStream in = null;
