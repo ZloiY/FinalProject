@@ -53,27 +53,41 @@ public class SecondFragment extends AppCompatActivity {
         fastAccess.add(new File(Environment.DIRECTORY_MUSIC));
         fastAccess.add(new File(Environment.DIRECTORY_DCIM));
         fastAccess.add(new File(Environment.DIRECTORY_PICTURES));
-        Intent intent = getIntent();
-        if(intent.hasExtra("curDirectory2")) {
-            String dirPath = intent.getStringExtra("curDirectory2");
-            if (dirPath.isEmpty())
-                fileSearch.fill(new File(dirPath));
-        }else{
-            fileSearch.fillHome(fastAccess, favorites);
-        }
-        if (intent.hasExtra("curDirectory1")) {
-            curDir1 = intent.getStringExtra("curDirectory1");
-        }
-        if (intent.hasExtra("copyFilePath")&&intent.hasExtra("copyFileName")) {
-            String copyFilePath = intent.getStringExtra("copyFilePath");
-            String copyFileName = intent.getStringExtra("copyFileName");
-            boolean cut = intent.getBooleanExtra("cut", false);
-            if (copyFileName != null && copyFilePath != null) {
+        if (onSavedInstances != null){
+            if (onSavedInstances.getString("copyFilePath") != null && onSavedInstances.getString("copyFileName") != null) {
                 ArrayList<Item> list = new ArrayList<>();
-                list.add(new Item(copyFileName, "", "", copyFilePath + "/" + copyFileName, "", true));
-                operations.setInputPath(copyFilePath);
-                operations.setInputPaths(list, cut);
-                operations.setFile(copyFileName);
+                list.add(new Item(onSavedInstances.getString("copyFileName"),"","",onSavedInstances.getString("copyFilePath")+"/"+onSavedInstances.getString("copyFileName"),"", true));
+                operations.setInputPath(onSavedInstances.getString("copyFilePath"));
+                operations.setInputPaths(list, onSavedInstances.getBoolean("cut"));
+            }
+            if (onSavedInstances.getString("curDir1") != null)
+                curDir1 = onSavedInstances.getString("curDir1");
+            if (onSavedInstances.getString("curDir2") != null)
+                fileSearch.fill(new File(onSavedInstances.getString("curDir2")));
+            else fileSearch.fillHome(fastAccess,favorites);
+        }else {
+            Intent intent = getIntent();
+            if (intent.hasExtra("curDirectory2")) {
+                String dirPath = intent.getStringExtra("curDirectory2");
+                if (dirPath.isEmpty())
+                    fileSearch.fill(new File(dirPath));
+            } else {
+                fileSearch.fillHome(fastAccess, favorites);
+            }
+            if (intent.hasExtra("curDirectory1")) {
+                curDir1 = intent.getStringExtra("curDirectory1");
+            }
+            if (intent.hasExtra("copyFilePath") && intent.hasExtra("copyFileName")) {
+                String copyFilePath = intent.getStringExtra("copyFilePath");
+                String copyFileName = intent.getStringExtra("copyFileName");
+                boolean cut = intent.getBooleanExtra("cut", false);
+                if (copyFileName != null && copyFilePath != null) {
+                    ArrayList<Item> list = new ArrayList<>();
+                    list.add(new Item(copyFileName, "", "", copyFilePath + "/" + copyFileName, "", true));
+                    operations.setInputPath(copyFilePath);
+                    operations.setInputPaths(list, cut);
+                    operations.setFile(copyFileName);
+                }
             }
         }
         switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -296,4 +310,16 @@ public class SecondFragment extends AppCompatActivity {
             //actionMode = null;
         }
     };
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (operations.getInputPath() != null)
+            outState.putString("copyFilePath", operations.getInputPath());
+        if (operations.getCurFile()!= null)
+            outState.putString("copyFileName", operations.getCurFile());
+        outState.putBoolean("cut", operations.cut);
+        if (fileSearch.getCurDir() != null)
+            outState.putString("curDir2", fileSearch.getCurDir());
+        if (curDir1 != null)
+            outState.putString("curDir1",curDir1);
+    }
 }
