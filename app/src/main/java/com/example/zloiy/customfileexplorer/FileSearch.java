@@ -1,7 +1,9 @@
 package com.example.zloiy.customfileexplorer;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,21 +20,21 @@ import java.util.List;
  * Created by ZloiY on 06-Aug-16.
  */
 public class FileSearch {
-    private AppCompatActivity curActivity;
+    private FragmentActivity activity;
     private ListView listView;
     private File curDir;
     private FileArrayAdapter adapter;
-    public FileSearch(SecondFragment activity, ListView listView){
-        curActivity = activity;
+    public FileSearch(FragmentActivity activity, ListView listView){
+        this.activity = activity;
         this.listView = listView;
     }
-    public FileSearch(FirstFragment activity, ListView listView){
-        curActivity = activity;
+    /*public FileSearch(FirstFragment activity, ListView listView){
+        //curActivity = activity;
         this.listView = listView;
-    }
+    }*/
 
     public void fillHome(ArrayList fastAccess, ArrayList favorites){
-        curActivity.setTitle("Select category: ");
+        activity.setTitle("Select category: ");
         File currentFile;
         List<Item> dir = new ArrayList<>();
         try{
@@ -69,7 +71,7 @@ public class FileSearch {
             e.getStackTrace();
         }
         Collections.sort(dir);
-        adapter = new FileArrayAdapter(curActivity, R.layout.list_layout, dir);
+        adapter = new FileArrayAdapter(activity, R.layout.list_layout, dir);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -82,7 +84,7 @@ public class FileSearch {
     }
     public void fill (final File file){
         File[] dirs = file.listFiles();
-        curActivity.setTitle("Current Dir: "+file.getName());
+        activity.setTitle("Current Dir: "+file.getName());
         List<Item>dir = new ArrayList<>();
         List<Item>fls = new ArrayList<>();
         try{
@@ -112,7 +114,7 @@ public class FileSearch {
         dir.addAll(fls);
         if (!file.getName().equalsIgnoreCase("/"))
             dir.add(0, new Item("..", "ParentDirectory", "", file.getParent(), "upfolder_icon"));
-        adapter = new FileArrayAdapter(curActivity, R.layout.list_layout, dir);
+        adapter = new FileArrayAdapter(activity, R.layout.list_layout, dir);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -137,7 +139,7 @@ public class FileSearch {
         int curItem = 0;
         File[] dirs = file.listFiles();
         MultiplyChekAdapter adapter;
-        curActivity.setTitle("Current Dir: "+file.getName());
+        activity.setTitle("Current Dir: "+file.getName());
         List<Item>dir = new ArrayList<>();
         List<Item>fls = new ArrayList<>();
         try{
@@ -167,12 +169,12 @@ public class FileSearch {
         dir.addAll(fls);
        /* if (!file.getName().equalsIgnoreCase("/"))
             dir.add(0, new Item("..", "ParentDirectory", "", file.getParent(), "upfolder_icon"));*/
-        adapter = new MultiplyChekAdapter(curActivity, R.layout.check_list, dir);
+        adapter = new MultiplyChekAdapter(activity, R.layout.check_list, dir);
         listView.setAdapter(adapter);
     }
     public void fillByName (String name){
         File[] dirs = curDir.listFiles();
-        curActivity.setTitle("Current Dir: "+curDir.getName());
+        activity.setTitle("Current Dir: "+curDir.getName());
         List<Item>dir = new ArrayList<>();
         List<Item>fls = new ArrayList<>();
         try{
@@ -203,7 +205,7 @@ public class FileSearch {
         dir.addAll(fls);
         if (!curDir.getName().equalsIgnoreCase("/"))
             dir.add(0, new Item("..", "ParentDirectory", "", curDir.getParent(), "upfolder_icon"));
-        adapter = new FileArrayAdapter(curActivity, R.layout.list_layout, dir);
+        adapter = new FileArrayAdapter(activity, R.layout.list_layout, dir);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -228,8 +230,8 @@ public class FileSearch {
         Intent intent = new Intent();
         intent.putExtra("GetPath", curDir.toString());
         intent.putExtra("GetFileName", item.getName());
-        curActivity.setResult(curActivity.RESULT_OK, intent);
-        curActivity.recreate();
+        activity.setResult(activity.RESULT_OK, intent);
+        activity.recreate();
     }
     public String getCurDir(){
         if (curDir!=null)

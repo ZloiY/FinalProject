@@ -36,7 +36,6 @@ public class MultiplyChekAdapter extends ArrayAdapter<Item> {
     public int getCount() {
         return itemCheckList.size();
     }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
@@ -68,19 +67,16 @@ public class MultiplyChekAdapter extends ArrayAdapter<Item> {
         }
         return view;
     }
-
     public ArrayList<Item> getArrayList(){
         ArrayList<Item> list = new ArrayList<>();
         for (int i=0; i < itemCheckList.size(); i++)
             list.add(itemCheckList.get(i));
         return list;
     }
-
     @Override
     public long getItemId(int position) {
         return 0;
     }
-
     @Override
     public Item getItem(int position) {
         return itemCheckList.get(position);
