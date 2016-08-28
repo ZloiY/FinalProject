@@ -37,16 +37,18 @@ public class SecondFragment extends Fragment {
     private FileSearch fileSearch;
     private ActionMode actionMode;
     private FileOperations operations;
-    private String curDir1;
     private ViewGroup rootView;
+    private String fileName;
+    private String filePath;
+    private String dir1;
+    private boolean cut;
     public void onCreate(Bundle savedInstanceState) {
-        setHasOptionsMenu(true);// âêëþ÷àåì ðåæèì âûâîäà ýëåìåíòîâ ôðàãìåíòà â ActionBar
         super.onCreate(savedInstanceState);
+        this.setHasOptionsMenu(true);
     }
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle onSavedInstances){
         rootView = (ViewGroup) inflater.inflate(R.layout.second_fargment, container, false);
         listView = (ListView) rootView.findViewById(R.id.fast_access);
-        ImageView rightArrow = (ImageView) rootView.findViewById(R.id.right_arrow);
         ImageView homeBtn = (ImageView) rootView.findViewById(R.id.home_btn);
         ToggleButton switchMode = (ToggleButton) rootView.findViewById(R.id.switch_mode);
         registerForContextMenu(listView);
@@ -59,44 +61,11 @@ public class SecondFragment extends Fragment {
         fastAccess.add(new File(Environment.DIRECTORY_DOWNLOADS));
         fastAccess.add(new File(Environment.DIRECTORY_MUSIC));
         fastAccess.add(new File(Environment.DIRECTORY_DCIM));
-        fastAccess.add(new File(Environment.DIRECTORY_PICTURES));
-        if (onSavedInstances != null){
-            if (onSavedInstances.getString("copyFilePath") != null && onSavedInstances.getString("copyFileName") != null) {
-                ArrayList<Item> list = new ArrayList<>();
-                list.add(new Item(onSavedInstances.getString("copyFileName"),"","",onSavedInstances.getString("copyFilePath")+"/"+onSavedInstances.getString("copyFileName"),"", true));
-                operations.setInputPath(onSavedInstances.getString("copyFilePath"));
-                operations.setInputPaths(list, onSavedInstances.getBoolean("cut"));
-            }
-            if (onSavedInstances.getString("curDir1") != null)
-                curDir1 = onSavedInstances.getString("curDir1");
-            if (onSavedInstances.getString("curDir2") != null)
-                fileSearch.fill(new File(onSavedInstances.getString("curDir2")));
-            else fileSearch.fillHome(fastAccess,favorites);
-        }else {
-            Intent intent = getActivity().getIntent();
-            if (intent.hasExtra("curDirectory2")) {
-                String dirPath = intent.getStringExtra("curDirectory2");
-                if (dirPath.isEmpty())
-                    fileSearch.fill(new File(dirPath));
-            } else {
-                fileSearch.fillHome(fastAccess, favorites);
-            }
-            if (intent.hasExtra("curDirectory1")) {
-                curDir1 = intent.getStringExtra("curDirectory1");
-            }
-            if (intent.hasExtra("copyFilePath") && intent.hasExtra("copyFileName")) {
-                String copyFilePath = intent.getStringExtra("copyFilePath");
-                String copyFileName = intent.getStringExtra("copyFileName");
-                boolean cut = intent.getBooleanExtra("cut", false);
-                if (copyFileName != null && copyFilePath != null) {
-                    ArrayList<Item> list = new ArrayList<>();
-                    list.add(new Item(copyFileName, "", "", copyFilePath + "/" + copyFileName, "", true));
-                    operations.setInputPath(copyFilePath);
-                    operations.setInputPaths(list, cut);
-                    operations.setFile(copyFileName);
-                }
-            }
-        }
+        if (dir1 != null) fileSearch.fill(new File(dir1));
+        else fileSearch.fillHome(fastAccess,favorites);
+        if (fileName != null) operations.setFile(fileName);
+        if (filePath != null) operations.setInputPath(filePath);
+        operations.cut = cut;
         switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -109,21 +78,6 @@ public class SecondFragment extends Fragment {
                 }
             }
         });
-       /* rightArrow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SecondFragment.this, FirstFragment.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("curDirectory1", curDir1);
-                intent.putExtra("copyFilePath", operations.getInputPath());
-                intent.putExtra("copyFileName", operations.getCurFile());
-                intent.putExtra("cut", operations.cut);
-                if (fileSearch.getCurDir()!=null) {
-                    intent.putExtra("curDirectory2", fileSearch.getCurDir());
-                }
-                startActivity(intent);
-            }
-        });*/
         homeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,7 +86,36 @@ public class SecondFragment extends Fragment {
         });
         return rootView;
     }
-
+    public String getFileName(){
+        if(operations.getCurFile() != null){
+            return operations.getCurFile();
+        }else return null;
+    }
+    public String getFilePath(){
+        if(operations.getInputPath() != null)
+            return operations.getInputPath();
+        else return null;
+    }
+    public boolean getCut(){
+       return operations.cut;
+    }
+    public String getCurDir(){
+        if (fileSearch.getCurDir() != null){
+            return fileSearch.getCurDir();
+        }else return null;
+    }
+    public void setFileName(String fileName){
+        this.fileName = fileName;
+    }
+    public void setFilePath(String filePath){
+        this.filePath = filePath;
+    }
+    public void setCut(boolean cut){
+        this.cut = cut;
+    }
+    public void setDir(String dir){
+        dir1 =dir;
+    }
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo info){
         super.onCreateContextMenu(menu,view,info);
         getActivity().getMenuInflater().inflate(R.menu.context_menu, menu);
