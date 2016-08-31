@@ -167,8 +167,6 @@ public class FileSearch {
         Collections.sort(dir);
         Collections.sort(fls);
         dir.addAll(fls);
-       /* if (!file.getName().equalsIgnoreCase("/"))
-            dir.add(0, new Item("..", "ParentDirectory", "", file.getParent(), "upfolder_icon"));*/
         adapter = new MultiplyChekAdapter(activity, R.layout.check_list, dir);
         listView.setAdapter(adapter);
     }
