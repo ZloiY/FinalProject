@@ -5,18 +5,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -32,28 +29,22 @@ import java.util.ArrayList;
 /**
  * Created by ZloiY on 28-Jul-16.
  */
-public class SecondFragment extends Fragment {
+public class SecondFragment extends AppCompatActivity {
     private ListView listView;
     private FileSearch fileSearch;
     private ActionMode actionMode;
     private FileOperations operations;
-    private ViewGroup rootView;
-    private String fileName;
-    private String filePath;
-    private String dir1;
-    private boolean cut;
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setHasOptionsMenu(true);
-    }
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle onSavedInstances){
-        rootView = (ViewGroup) inflater.inflate(R.layout.second_fargment, container, false);
-        listView = (ListView) rootView.findViewById(R.id.fast_access);
-        ImageView homeBtn = (ImageView) rootView.findViewById(R.id.home_btn);
-        ToggleButton switchMode = (ToggleButton) rootView.findViewById(R.id.switch_mode);
+    private String curDir1;
+    protected void onCreate(Bundle onSavedInstances){
+        super.onCreate(onSavedInstances);
+        setContentView(R.layout.second_fargment);
+        listView = (ListView) findViewById(R.id.fast_access);
+        ImageView rightArrow = (ImageView) findViewById(R.id.right_arrow);
+        ImageView homeBtn = (ImageView) findViewById(R.id.home_btn);
+        ToggleButton switchMode = (ToggleButton) findViewById(R.id.switch_mode);
         registerForContextMenu(listView);
-        fileSearch = new FileSearch(getActivity(), listView);
-        operations = new FileOperations(getContext());
+        fileSearch = new FileSearch(SecondFragment.this, listView);
+        operations = new FileOperations(SecondFragment.this);
         final ArrayList<File> fastAccess = new ArrayList<>();
         final ArrayList<File> favorites = new ArrayList<>();
         fastAccess.add(new File(Environment.getRootDirectory().getPath()));
@@ -61,21 +52,69 @@ public class SecondFragment extends Fragment {
         fastAccess.add(new File(Environment.DIRECTORY_DOWNLOADS));
         fastAccess.add(new File(Environment.DIRECTORY_MUSIC));
         fastAccess.add(new File(Environment.DIRECTORY_DCIM));
-        if (dir1 != null) fileSearch.fill(new File(dir1));
-        else fileSearch.fillHome(fastAccess,favorites);
-        if (fileName != null) operations.setFile(fileName);
-        if (filePath != null) operations.setInputPath(filePath);
-        operations.cut = cut;
+        fastAccess.add(new File(Environment.DIRECTORY_PICTURES));
+        if (onSavedInstances != null){
+            if (onSavedInstances.getString("copyFilePath") != null && onSavedInstances.getString("copyFileName") != null) {
+                ArrayList<Item> list = new ArrayList<>();
+                list.add(new Item(onSavedInstances.getString("copyFileName"),"","",onSavedInstances.getString("copyFilePath")+"/"+onSavedInstances.getString("copyFileName"),"", true));
+                operations.setInputPath(onSavedInstances.getString("copyFilePath"));
+                operations.setInputPaths(list, onSavedInstances.getBoolean("cut"));
+            }
+            if (onSavedInstances.getString("curDir1") != null)
+                curDir1 = onSavedInstances.getString("curDir1");
+            if (onSavedInstances.getString("curDir2") != null)
+                fileSearch.fill(new File(onSavedInstances.getString("curDir2")));
+            else fileSearch.fillHome(fastAccess,favorites);
+        }else {
+            Intent intent = getIntent();
+            if (intent.hasExtra("curDirectory2")) {
+                String dirPath = intent.getStringExtra("curDirectory2");
+                if (dirPath.isEmpty())
+                    fileSearch.fill(new File(dirPath));
+            } else {
+                fileSearch.fillHome(fastAccess, favorites);
+            }
+            if (intent.hasExtra("curDirectory1")) {
+                curDir1 = intent.getStringExtra("curDirectory1");
+            }
+            if (intent.hasExtra("copyFilePath") && intent.hasExtra("copyFileName")) {
+                String copyFilePath = intent.getStringExtra("copyFilePath");
+                String copyFileName = intent.getStringExtra("copyFileName");
+                boolean cut = intent.getBooleanExtra("cut", false);
+                if (copyFileName != null && copyFilePath != null) {
+                    ArrayList<Item> list = new ArrayList<>();
+                    list.add(new Item(copyFileName, "", "", copyFilePath + "/" + copyFileName, "", true));
+                    operations.setInputPath(copyFilePath);
+                    operations.setInputPaths(list, cut);
+                    operations.setFile(copyFileName);
+                }
+            }
+        }
         switchMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked){
-                    actionMode = getActivity().startActionMode(actionBar);
+                    actionMode = startActionMode(actionBar);
                     fileSearch.fillWithCheck(new File(fileSearch.getCurDir()));
                 }else{
                     actionMode.finish();
                     fileSearch.fill(new File(fileSearch.getCurDir()));
                 }
+            }
+        });
+        rightArrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SecondFragment.this, FirstFragment.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("curDirectory1", curDir1);
+                intent.putExtra("copyFilePath", operations.getInputPath());
+                intent.putExtra("copyFileName", operations.getCurFile());
+                intent.putExtra("cut", operations.cut);
+                if (fileSearch.getCurDir()!=null) {
+                    intent.putExtra("curDirectory2", fileSearch.getCurDir());
+                }
+                startActivity(intent);
             }
         });
         homeBtn.setOnClickListener(new View.OnClickListener() {
@@ -84,41 +123,101 @@ public class SecondFragment extends Fragment {
                 fileSearch.fillHome(fastAccess,favorites);
             }
         });
-        return rootView;
     }
-    public String getFileName(){
-        if(operations.getCurFile() != null){
-            return operations.getCurFile();
-        }else return null;
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
     }
-    public String getFilePath(){
-        if(operations.getInputPath() != null)
-            return operations.getInputPath();
-        else return null;
+    public boolean onOptionsItemSelected(MenuItem item) {
+        setOptionsMenu(item);
+        return true;
     }
-    public boolean getCut(){
-       return operations.cut;
-    }
-    public String getCurDir(){
-        if (fileSearch.getCurDir() != null){
-            return fileSearch.getCurDir();
-        }else return null;
-    }
-    public void setFileName(String fileName){
-        this.fileName = fileName;
-    }
-    public void setFilePath(String filePath){
-        this.filePath = filePath;
-    }
-    public void setCut(boolean cut){
-        this.cut = cut;
-    }
-    public void setDir(String dir){
-        dir1 =dir;
+    private void setOptionsMenu(MenuItem item){
+        View layout;
+        switch (item.getItemId()) {
+            case R.id.new_folder:
+                layout = getLayoutInflater().inflate(R.layout.new_folder, null);
+                final EditText folderName = (EditText) layout.findViewById(R.id.folder_name);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                        .setTitle("Create folder")
+                        .setView(layout)
+                        .setCancelable(true)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                File curFolder = new File(fileSearch.getCurDir() + "/" + folderName.getText().toString());
+                                if (!curFolder.exists()) curFolder.mkdir();
+                                fileSearch.fill(new File(fileSearch.getCurDir()));
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder.create().show();
+                break;
+            case R.id.search:
+                layout = getLayoutInflater().inflate(R.layout.search_by_name, null);
+                EditText searchByName = (EditText) layout.findViewById(R.id.file_name);
+                searchByName.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        fileSearch.fillByName(s.toString());
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+                AlertDialog.Builder builder1 = new AlertDialog.Builder(this)
+                        .setTitle("File search")
+                        .setView(layout)
+                        .setCancelable(true);
+                builder1.create().show();
+                break;
+            case R.id.paste:
+                if(!operations.getInputPath().isEmpty()) operations.copyInAnotherTask(fileSearch.getCurDir());
+                Toast.makeText(this, "Files paste", Toast.LENGTH_SHORT).show();
+                fileSearch.fill(new File(fileSearch.getCurDir()));
+                break;
+            case R.id.new_file:
+                layout = getLayoutInflater().inflate(R.layout.new_folder, null);
+                final EditText fileName= (EditText)layout.findViewById(R.id.folder_name);
+                AlertDialog.Builder builder2 = new AlertDialog.Builder(this)
+                        .setTitle("New file")
+                        .setCancelable(true)
+                        .setView(layout)
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                operations.newFile(fileName.getText().toString(),fileSearch.getCurDir(), getBaseContext());
+                                fileSearch.fill(new File(fileSearch.getCurDir()));
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                builder2.create().show();
+                break;
+        }
     }
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo info){
         super.onCreateContextMenu(menu,view,info);
-        getActivity().getMenuInflater().inflate(R.menu.context_menu, menu);
+        getMenuInflater().inflate(R.menu.context_menu, menu);
     }
     public boolean onContextItemSelected(MenuItem item){
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -131,21 +230,21 @@ public class SecondFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.copy:
                 operations.setCut(false);
-                Toast.makeText(getContext(),"File copy",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"File copy",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.cut:
                 operations.setCut(true);
-                Toast.makeText(getContext(),"File cut", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"File cut", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.delete:
                 operations.deleteFile(item1.getName(),fileSearch.getCurDir());
                 fileSearch.fill(new File(fileSearch.getCurDir()));
                 break;
             case R.id.change_name:
-                View layout = getActivity().getLayoutInflater().inflate(R.layout.new_folder,null);
+                View layout = getLayoutInflater().inflate(R.layout.new_folder,null);
                 final EditText changeName = (EditText)layout.findViewById(R.id.folder_name);
                 changeName.setText(item1.getName());
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+                AlertDialog.Builder builder = new AlertDialog.Builder(this)
                         .setView(layout)
                         .setTitle("Change name")
                         .setCancelable(true)
@@ -194,13 +293,13 @@ public class SecondFragment extends Fragment {
                     MultiplyChekAdapter copyAdapter = (MultiplyChekAdapter) listView.getAdapter();
                     operations.setInputPath(fileSearch.getCurDir());
                     operations.setInputPaths(copyAdapter.getArrayList(), false);
-                    Toast.makeText(getActivity().getBaseContext(),operations.getInputPaths().size() + " files copy", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(),operations.getInputPaths().size() + " files copy", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.cut:
                     MultiplyChekAdapter copyAdapter1 = (MultiplyChekAdapter) listView.getAdapter();
                     operations.setInputPath(fileSearch.getCurDir());
                     operations.setInputPaths(copyAdapter1.getArrayList(), true);
-                    Toast.makeText(getActivity().getBaseContext(),operations.getInputPaths().size() + " files cut", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(),operations.getInputPaths().size() + " files cut", Toast.LENGTH_SHORT).show();
                     break;
             }
             return false;
@@ -211,93 +310,16 @@ public class SecondFragment extends Fragment {
             //actionMode = null;
         }
     };
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-    public boolean onOptionsItemSelected(MenuItem item) {
-        setOptionsMenu(item);
-        return true;
-    }
-    private void setOptionsMenu(MenuItem item){
-        View layout;
-        switch (item.getItemId()) {
-            case R.id.new_folder:
-                layout = getActivity().getLayoutInflater().inflate(R.layout.new_folder, null);
-                final EditText folderName = (EditText) layout.findViewById(R.id.folder_name);
-                final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext())
-                        .setTitle("Create folder")
-                        .setView(layout)
-                        .setCancelable(true)
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                File curFolder = new File(fileSearch.getCurDir() + "/" + folderName.getText().toString());
-                                if (!curFolder.exists()) curFolder.mkdir();
-                                fileSearch.fill(new File(fileSearch.getCurDir()));
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                builder.create().show();
-                break;
-            case R.id.search:
-                layout = getActivity().getLayoutInflater().inflate(R.layout.search_by_name, null);
-                EditText searchByName = (EditText) layout.findViewById(R.id.file_name);
-                searchByName.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        fileSearch.fillByName(s.toString());
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                    }
-                });
-                android.support.v7.app.AlertDialog.Builder builder1 = new android.support.v7.app.AlertDialog.Builder(getContext())
-                        .setTitle("File search")
-                        .setView(layout)
-                        .setCancelable(true);
-                builder1.create().show();
-                break;
-            case R.id.paste:
-                if(!operations.getInputPath().isEmpty()) operations.copyInAnotherTask(fileSearch.getCurDir());
-                Toast.makeText(getContext(), "Files paste", Toast.LENGTH_SHORT).show();
-                fileSearch.fill(new File(fileSearch.getCurDir()));
-                break;
-            case R.id.new_file:
-                layout = getActivity().getLayoutInflater().inflate(R.layout.new_folder, null);
-                final EditText fileName= (EditText)layout.findViewById(R.id.folder_name);
-                android.support.v7.app.AlertDialog.Builder builder2 = new android.support.v7.app.AlertDialog.Builder(getContext())
-                        .setTitle("New file")
-                        .setCancelable(true)
-                        .setView(layout)
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                operations.newFile(fileName.getText().toString(),fileSearch.getCurDir(), getContext());
-                                fileSearch.fill(new File(fileSearch.getCurDir()));
-                                dialog.dismiss();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                builder2.create().show();
-                break;
-        }
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (operations.getInputPath() != null)
+            outState.putString("copyFilePath", operations.getInputPath());
+        if (operations.getCurFile()!= null)
+            outState.putString("copyFileName", operations.getCurFile());
+        outState.putBoolean("cut", operations.cut);
+        if (fileSearch.getCurDir() != null)
+            outState.putString("curDir2", fileSearch.getCurDir());
+        if (curDir1 != null)
+            outState.putString("curDir1",curDir1);
     }
 }
